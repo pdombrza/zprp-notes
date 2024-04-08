@@ -1,3 +1,6 @@
 __pycache__
 *.pyc
 *.db
+
+*.mypy_cache
+*.pytest_cache

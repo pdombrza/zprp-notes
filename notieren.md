@@ -937,3 +937,205 @@ Można poczytać o tym talki Jamesa Powella
 
 ### *args, **kwargs
 
+args - argumenty nienazwane, kwargs - nazwane (key word arguments)
+
+
+## Wykład 5
+### kolejka
+
+Pakiet heapq
+
+kolejka podobna do ```sorted``` ale mogą być przypadki gdzie heapq lepsze, wydajniejsze
+
+
+```python
+import heapq
+
+nums = [1, 8, 2, -4, 5, -7, 22, 33, 4, 38]
+
+print(heapq.nlargest(3, nums))
+print(heapq.nsmallest(3, nums))
+```
+
+Można też sortować takie struktury:
+
+```python
+portfolio = [
+    {"name": "IBM", "shares": 100, "price": 91.1},
+    {"name": "GOOGL", "shares": 76, "price": 543.2},
+    {"name": "FB", "shares": 42, "price": 73.2},
+    {"name": "ACME", "shares": 167, "price": 143.65},
+]
+
+cheap = heapq.nsmallest(3, portfolio, key=lambda s: s["price"])
+expensive = heapq.nlargest(3, portfolio, key=lambda s: s["price"])
+```
+
+Lambda - nienazwana funkcja, której z reguły chcemy uzyć w 1 miejscu i o niej zapomnieć
+
+heapq:
+nlargest i nsmallest działają dobrze przy małej ilości elementów, do 1 elementu min i max
+
+kolejka priorytetowa z heapq:
+
+```python
+import heapq
+
+class PriorityQueue:
+    def __init__(self):
+        self._queue = []
+        self._index = 0
+
+    def push(self, item, priority):
+        heapq.heappush(self._queue, ((-priority), self._index, item))
+        self._index += 1
+
+    def pop(self):
+        return heapq.heappop(self._queue)[-1]
+```
+
+
+### Testowanie
+#### Doctest
+Pokazuje użytkownikowi jak używać funkcji
+testują kod
+interpreter parsuje test w docstringu
+Wywołanie:
+```bash
+python3 -m doctest square.py -v # -v - verbose, wypisuje output testów na terminal
+```
+
+Przykład w kodzie:
+```python
+def square(x):
+    """
+    Squares the input.
+
+    >>> square(2)
+    4
+    >>> square(-2)
+    4
+    """
+    return x * x
+```
+
+W zasadzie bezkosztowe testowanie kodu w pythonie
+info w dokumentacji Pythona
+
+mypy - narzędzie do statecznego testowania typów w pythonie
+(oddzielne narzędzie - można dodać do potoku CI)
+
+type hinty
+dużo w module typing
+
+z ciekawych:
+```python
+from typing import TypeVar, Generic, List, Callable # w 3.10 i wyżej list wspierane zamiast List
+
+T = TypeVar("T")
+
+
+def filter_list(items: List[T], condition: Callable[[T], bool])
+    ...
+```
+
+#### Pytest
+
+Jakieś fajne featury pytesta
+
+są wtyczki do Django, Flaska
+minusy - dziwna składnia
+
+fixture - dynks (xdd)
+
+```@pytest.fixture``` - wstrzykiwanie obiektu do wszystkich testów
+
+
+```python
+from dataclasses import dataclass
+import pytest
+
+@dataclass
+class User:
+    name: str
+    age: int
+
+    @property
+    def nickname(self):
+        return f"{self.name.lower()}{self.age}"
+
+
+# Dla uproszczenia testy w tym samym pliku
+
+@pytest.fixture
+def user_instance():
+    return User("John", 42)
+
+
+def test_user_nickname_typical(user_instance):
+    assert user_instance.nickname == "john42"
+```
+
+Taki fixture reużywalny do wszystkich testów
+
+Jak wpiszemy fixture'y w pliku conftest.py to pytest automatycznie będzie rozpoznawał i importował
+
+```bash
+pytest -v # verbose - więcej info
+pytest --fixtures # podaje dostępne fixture'y
+pytest -s # można przechwytywać output z testów
+pytest -k # można wywołać 1 test po sygnaturze
+```
+
+Zazwyczaj fixture'y jedną z 3 postaci
+- realizują logikę
+- tworzą obiekty i zwracają
+- trochę jak manadzer kontekstu - setup teardown
+
+Przykładowy fixture typu 3:
+
+```python
+@pytest.fixture
+def temporary_dir(): # juz istnieje ale na testa piszemy fixture co tworzy tymczasowy katalog
+    with tempfile.TemporaryDirectory() as tmpdir:
+        yield tmpdir
+```
+
+dekorator @pytest.mark
+
+markery można zarejestrować w pliku pytest.ini
+można wywoływać testy według markerów - które markery robimy, które markery nie
+
+Testy sparametryzowane
+
+```python
+@pytest.mark.parametrize(
+    ("input_n", "expected"),
+    [
+        (1, 1),
+        (-1, 1),
+        (2, 4),
+        pytest.param(-2, 4, id="negative case"), # w parametryzacji można dodawać nazwy
+        Case(input_n=0, expected=0),
+        ]
+)
+def test_square_integers(input_n, expected):
+    assert square(input_n) == expected
+
+
+@pytest.mark.parametrize(
+    "input_n",
+    [
+        "a",
+        {},
+        [],
+    ]
+)
+def test_square_error(input_n):
+    with pytest.raises(TypeError):
+        square(input_n)
+```
+
+1:05:20
+
+## Wykład 6
