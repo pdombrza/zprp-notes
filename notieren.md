@@ -1136,6 +1136,246 @@ def test_square_error(input_n):
         square(input_n)
 ```
 
-1:05:20
+Wtyczka do pytesta - `pytest-benchmark`
+Benchmark alokuje ilość czasu na dany test - i sprawdza ile razy wykona fragment kodu
+
+```python
+@pytest.fixture
+def concat_data():
+    destination_list = list(range(10000))
+    source_list = list(range(1000, 8000))
+    result = list(range(1500, 8000)) + list(range(6500, 10000))
+    return destination_list, source_list, result
+
+
+def test_naive_concatenate(concat_data, benchmark):
+    assert benchmark(naive_concatenate, *concat_data[:2], 0, 500) == concat_data[-1] # asercja , czy wynik fcji jest taki jak powinien
+    # do f concatenate wstrzykuję 2 elementy tej krotki (destination i source ) oraz offset i offset
+```
+Nie za dużo kodu a daje statystyki do porównania wydajności
+Można wyłączyć:
+```shell
+pytest -v --benchmark-disable
+```
+Wtedy wywoła każdy test 1 raz
+
+Inne wtyczki:
+* `pytest-coverage` - do obliczenia pokrycia kodu testami
+* `pytest-html` - generuje raporty w htmlu z pokrycia testami
+
+```shell
+pytest --cov --cov-report=html
+```
+Inne paradygmaty testowania (nie jednostkowe).
+Property based testing - testowanie oparte na własnościach
+
+`reduce` z `functools` - redukuje sekwencję do akumulatora (z paradygmatu funkcyjnego)
+
+Domyślnie hypothesis generuje 100 przypadków testowych - testuje różne typy danych, nietrywialne przypadki
+dekoratory:
+* `example` - przykładowy przypadek
+* `settings` - dodatkowe ustawienia, może być `max_examples` np. = 500, wtedy 500 przypadków
+
+```shell
+pytest -v -s --hypothesis-show-statistics
+```
+Statystyki do testów, ile exampli przeszło, ile nie itp.
+```shell
+pytest -v -s --hypothesis-show-statistics --verbosity=debug
+```
+Wtedy dostaniemy wszystkie przypadki jakie zostały wygenerowane
+
+Można też samemu definiować strategię generowania obiektów klas do testów.
+
+Ciekawy przykład w `test_quadratic.py`
+<!-- TODO: add link -->
+
+Mutation testing - fault injection
+Dodawanie błędów i sprawdzanie jak aplikacja jest na nie odporna. Tworzone mutanty - kod modyfikowany (np. podmiana operatorów) i sprawdzanie jak da radę. Celowo wstrzykujemy błędy i sprawdzamy, czy testy "zabiją" mutanta (czy wywalą popsuty kod).
+Przykładowe narzędzie - `mut.py` - nie aż tak popularne (300 gwiazdek).
+Inny framework - `cosmicray`.
+
+Uogólniona wersja mutation testowania - `fuzzing` - może być motyfikacja bytecodu Pythona czy dla innych języków skompilowanego kodu.
+Przykładowe narzędzie - `Atheris` od Google.
 
 ## Wykład 6
+### Zarządzanie pakietami, projektem
+
+Dzisiaj z Neumannem
+Jak zarządzać projektem pythonowym itp.
+[slajdy](https://staff.elka.pw.edu.pl/~lneumann/python_packaging.pdf)
+
+Relevant xkcd
+
+rye - nie jest production ready ale ciekawe narzędzie, najmniej pisania kodu
+
+plik ```pyproject.toml``` dane o pakietach itp.
+
+```pairwise``` w itertoolsach - sliding window, kiedyś by się przydało
+
+za pomocą rye możemy zarządzać pakietami, dzielić na środowiska (np. dodać pytesta tylko do dev, no bo na produkcji wywalone) i zbudować projekt
+
+rich - preview
+biblioteka do pracy z narzędziamy cli
+można sobie progress bara dodać (pewnie wgl inne rzeczy też na razie to tyle)
+
+kontynuując rye:
+opcjonalne pakiety
+
+```bash
+rye publish
+```
+nasz pakiet zostaje publikowany na pipa i wtedy można normalnie zainstalować nasz pakiecik pipem (pip install)
+
+### Zarządzanie wersją Pythona
+Nie warto instalować pakietów do systemowej wersji Pythona, jak się zrobi syf to niektóre narzędzia systemu mogą przestać działać
+
+Przykładowe narzędzia do zarządzania wersją Pythona:
+* Pyenv
+* rye
+* hatch
+* conda (ale to trochę inna bestia)
+
+### Importowanie w Pythonie
+
+- Moduł
+  * Pojedynczy plik ```.py```
+- Pakiet
+  * katalog z plikiem ```__init__.py```, który może być pusty
+
+W dokumentacji Pythona dobry [tutorial](https://docs.python.org/3/tutorial/modules.html)
+
+Jak działa import?
+* korzysta po kolei z tzw. importerów z ```sys.meta_path```
+* jednym z nich jest PathFinder, który korzysta z ```sys.path```
+
+[dokumentacja o tych pathach](https://docs.python.org/3/library/sys_path_init.html)
+
+Można modyfikować ```sys.path```
+
+### Środowiska wirtualne
+
+Narzędzia do tworzenia i zarządzania środowiskami wirtualnymi
+* Wbudowany moduł ```venv```
+* Nakładna na ```venv``` - ```virtualenv```, rekomendacja by używać ```virtualenv``` zamiast ```venv``` (szybsze, potężniejsze)
+* ```uv```
+* ```pipenv``` - podobny do ```uv```
+
+### Jak instalować pakiety?
+```bash
+pip install numpy # i prayge
+```
+
+W globalnym środowisku może próbować nadpisać
+Teraz już zaczynają być obostrzenia, żeby nie instalować na systemowym Pythonie.
+
+Alternatywy:
+* ```uv```
+* ```pipenv```
+* ```poetry```
+* ```hatch```
+* ```rye```
+
+Przy instalacji pakietów można specyfikować wersję (np. SomePackage >= 1.3), podać konkretną (SomePackage == 1.3), dodawać feature'y (SomePackage[feature1, feature2])
+
+Jak instalować wykonywalne narzędzia Pythonowe?
+Za pomocą systemowego managera pakietów (Ubuntu - ```apt```) lub ```pipx```
+Automatyczne zarządzanie wirtualnym środowiskiem per narzędzie
+
+### Jak specyfikować zależności?
+- Plik ```requirements.txt```
+  * Lista pakietów, 1 na linię
+  * różne grupy zależności - kilka plików ```requirements.txt```
+- Plik ```pyproject.toml```
+  * składnia tomlowa
+  * podział pakietów na grupy zależności
+W ```pyproject.toml``` można dużo napisać (urle projektu, dependecies, optional dependencies, ścieżka do readme, licencji itp.)
+
+
+### Dependency resolution
+Co się dzieje pod spodem jak piszemy ```pip install```?
+Wersje poszczególnych zależności nie mogą być ze sobą w konflikcie.
+
+Większość narzędzi do rozwiązywania zależności robi to dla konkretnej wersji Pythona i środowiska (OS)
+Obecnie wyjątkiem są narzędzia ```poetry``` i ```pdm```
+
+### Lockfile
+- Czasem długo trwa ściąganie pakietu
+  * nie da się dostać do zależności pakietu bez ściągnięcia go w całości, uciążliwe jak są pakiety mające duże pliki binarne (numpy)
+  * przy wielu niekompatybilnych wersjach pakietów w zależności od algorytmu
+    rozwiązywania zależności trzeba sprawdzić wiele różnych wersji zanim trafi się w
+    taką, która spełnia wszystkie wymagania
+- Standardowo po rozwiązaniu wersji zależności zapisuje się je wraz z metadanymi do tzw. lockfile'a
+  * W metadanych oprócz wersji zależności mogą być przechowywane np. wartości
+    funkcji skrótu dla plików pakietu, a także informacja jakie zależności ma dany pakiet
+- Obecnie w Pythonie nie ma ustandaryzowanego formatu Lockfile, więc różnią się
+one w zależności od narzędzia, które go wygeneruje
+
+Generowanie lockfile
+- za pomocą ```pip freeze```
+- przy użyciu narzędzia np.
+  * ```pdm```
+  * ```pipenv```
+  * ```poetry```
+  * ```rye```
+- należy wrzucić lockfile'a na repozytorium - umożliwi to reproduktowalność środowiska, zakładając że ten sam OS
+
+### Pakiety SDIST - source distribution
+* Zawiera wszystkie pliki, które są potrzebne do zainstalowania i przetestowania
+pakietu
+* Przypomina środowisko deweloperskie
+
+Pakiety Wheel
+* Zawirają wszystkie pliki potrzebne do zainstalowania pakietu
+
+```distutils``` - prehistoria budowania pakietów
+* 2000 r.
+* moduł deprecated w Pythonie 3.10, usunięty w 3.12
+* moduł biblioteki standardowej
+* programista pisał w Pythonie kod do budowania swojego pakietu
+
+```setuptools``` - supercharged distutils
+* 2004 r.
+* lepsze ```distutils```, wiele usprawnień
+* wraz z ```packaging``` reimplementuje ```distutils```
+* używa się w ```setup.py```
+* przez lata standard budowania pakietów
+* nadal można korzystać, część projektów nadal korzysta z ```setuptools```
+
+```flit``` - deklaratywne budowanie pakietów
+* używanie Pythonia do budowania Pythona - nie taki dobry pomysł
+* dzięki temu mamy pyproject.toml i inne narzędzia tego typu
+
+### Budowanie pakietów - podział na frontend i backend
+Backend - buduje pakiet w odizolowanym środowisku
+* ```setuptools```
+* ```flit```
+* ```poetry```
+* ```pdm```
+* ```hatchling ( hatch )```
+Frontend - inicjalizuje środowisko i mówi backendowi żeby robił paczkę
+* ```build```
+* ```poetry```
+* ```pdm```
+* ```rye```
+* ```pip```
+* ```tox```
+
+w `pyproject.toml` można zdefiniować konfigurację backendu.
+
+### Jak opublikować pakiet?
+* Trzeba założyć konto na PyPi i użyć jednego z narzędzi
+
+### SOTA: jedno narzędzie do wszystkiego
+- Obecnie jest ich kilka (kombajnów)
+- [Porównianie](https://github.com/pdm-project/pdm#comparisons-to-other-alternatives) - brakuje `rye`
+- Kilka najpopularniejszych narzędzi:
+  * `pdm`
+  * `poetry`
+  * `rye` - nie jest production ready
+  * `hatch`
+
+`poetry` nie pozwala na specyfikację backendu - korzysta ze swojego oraz trzyma metadane w tablicy `[tool.poetry]` zamiast ustandaryzowanej reprezentacji w `pyproject.toml` (PEP621)
+
+
+Na kolosie trzeba będzie użyć jeden z tych menedzerów pakietów i zbudować taki projekt i nim zarządzać.
