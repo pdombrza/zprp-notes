@@ -1,7 +1,0 @@
-{
-    "python.testing.pytestArgs": [
-        "w5_pytest_hypothesis"
-    ],
-    "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true
-}
