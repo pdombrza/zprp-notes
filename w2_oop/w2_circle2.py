@@ -1,8 +1,9 @@
 # Nowe obostrzenie do Circle - nie możemy przechowywać promienia wgl, tylko średnice. Bez getterów i setterów w Javie/C++ nie da się
 import math
 
+
 class Circle:
-    """ Represents a Circle"""
+    """Represents a Circle"""
 
     def __init__(self, radius):
         self.radius = radius
@@ -15,4 +16,3 @@ class Circle:
     @radius.setter
     def radius(self, radius):
         self.diameter = radius * 2.0
-

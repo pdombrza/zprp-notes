@@ -485,7 +485,7 @@ def compute_gen():
         sleep(0.5)
         yield i
 ```
-Generator - lazy fetch
+Generator - lazy fetch \
 Na generatorach zaimplementowane zostało async io
 
 ```python
@@ -493,13 +493,13 @@ class Program:
     first(): ...
     second(): ...
     third(): ...
-
-first()
-yield
-second()
-yield
-third()
-yield
+    def do_stuff:
+        first()
+        yield
+        second()
+        yield
+        third()
+        yield
 ```
 
 Można też takie coś robić:
@@ -521,10 +521,10 @@ def countdown(n):
 
 Bardziej zaawansowany przykład:
 Piszemy funkcję search(), która będzie miała api:
-search(fh, pattern, history)
-fh - filehandle
-pattern - wiadomka
-history - wiadomo
+* search(fh, pattern, history)
+* fh - filehandle
+* pattern - wiadomka
+* history - wiadomo
 
 ```python
 from collections import deque

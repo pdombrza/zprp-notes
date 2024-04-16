@@ -14,7 +14,9 @@ class Node:
         self._value = value
         self._children = []
 
-    def __repr__(self): # tak się definiuje zazwyczaj repr w klasach, repr powinien zwracać coś, co wrzucone w interpreter stworzy instancję klasy
+    def __repr__(
+        self,
+    ):  # tak się definiuje zazwyczaj repr w klasach, repr powinien zwracać coś, co wrzucone w interpreter stworzy instancję klasy
         return f"{self.__class__.__name__}({self._value})"
 
     def add_child(self, node):
@@ -26,6 +28,7 @@ a = {"a": 1, "b": 2}
 from collections import Counter
 
 from collections import defaultdict
+
 d = defaultdict(list)
 d["a"]
 print(d)

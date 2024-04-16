@@ -1,9 +1,11 @@
 from typing import NamedTuple
 
+
 class Color(NamedTuple):
     hue: int
     saturation: float
     lightness: float = 0.5
+
 
 c = Color(33, 1.0)
 c._replace(hue=120)

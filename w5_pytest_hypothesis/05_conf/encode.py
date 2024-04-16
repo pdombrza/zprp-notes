@@ -1,5 +1,6 @@
 from functools import reduce
 
+
 def to_ascii_codes(inp: str) -> list[int]:
     return [ord(c) for c in inp]
 

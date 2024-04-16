@@ -24,6 +24,7 @@ from contextlib import contextmanager
 #     yield
 #     cur.execute("DROP TABLE points")
 
+
 @contextmanager
 def temptable(cur):
     cur.execute("CREATE TABLE points (x INTEGER, y INTEGER)")

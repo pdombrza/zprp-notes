@@ -15,6 +15,7 @@ class User:
 
 # Dla uproszczenia testy w tym samym pliku
 
+
 @pytest.fixture
 def user_instance():
     return User("John", 42)
@@ -32,7 +33,7 @@ def setup_teardown():
 
 
 @pytest.fixture
-def temporary_dir(): # juz istnieje ale na testa piszemy fixture co tworzy tymczasowy katalog
+def temporary_dir():  # juz istnieje ale na testa piszemy fixture co tworzy tymczasowy katalog
     with tempfile.TemporaryDirectory() as tmpdir:
         yield tmpdir
 
@@ -44,7 +45,6 @@ def test_naive_tmp_dir(temporary_dir):
 
 def test_with_setup_teardown(setup_teardown):
     print("in test")
-
 
 
 @pytest.mark.slow

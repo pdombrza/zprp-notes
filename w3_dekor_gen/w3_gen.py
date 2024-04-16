@@ -1,5 +1,6 @@
 def add(x, y):
-    return x+y
+    return x + y
+
 
 class Adder:
     def __call__(self, x, y):
@@ -8,12 +9,14 @@ class Adder:
 
 from time import sleep
 
+
 def compute():
     values = []
     for i in range(10):
         sleep(0.5)
         values.append(i)
     return values
+
 
 class Compute:
     def __iter__(self):

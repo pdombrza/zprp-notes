@@ -1,10 +1,6 @@
 from collections import ChainMap
 
-environ = {
-    "a": "path",
-    "b": "os",
-    "c": "test"
-}
+environ = {"a": "path", "b": "os", "c": "test"}
 
 defaults = {"color": "red", "user": "guest"}
 

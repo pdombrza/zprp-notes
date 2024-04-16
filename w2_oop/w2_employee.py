@@ -21,6 +21,7 @@ from dataclasses import fields
 from datetime import datetime
 from pprint import pprint
 
+
 @dataclass(order=True, unsafe_hash=True)
 class Employee:
     emp_id: int = field()
@@ -36,3 +37,6 @@ class Employee:
 
 e1 = Employee(emp_id=784318, name="Janusz Strzała", gender="male", salary=20, age=36)
 e2 = Employee(emp_id=784329, name="Halina Strzała", gender="female", salary=11, age=25)
+
+e1.access("Steve Johnson")
+e1.access("Abby")
