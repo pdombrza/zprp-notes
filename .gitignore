@@ -7,3 +7,6 @@ __pycache__
 .venv
 .vscode
 .hypothesis
+
+before_test1
+kol1

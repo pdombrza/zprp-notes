@@ -43,3 +43,6 @@ with connect("points.db") as conn:
 
         for row in cur.execute("SELECT sum(x + y) FROM points"):
             print(row)
+
+
+# Przykład generycznego menadzera kontekstu - w notatkach

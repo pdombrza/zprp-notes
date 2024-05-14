@@ -933,6 +933,21 @@ def f():
         yield
 ```
 
+Przykład generycznego menedżera kontekstu:
+```python
+from contextlib import contextmanager
+
+@contextmanager
+def managed_resource(*args, **kwds):
+    # Code to acquire resource, e.g.:
+    resource = acquire_resource(*args, **kwds)
+    try:
+        yield resource
+    finally:
+        # Code to release resource, e.g.:
+        release_resource(resource)
+```
+
 Można poczytać o tym talki Jamesa Powella
 
 ### *args, **kwargs
@@ -1379,3 +1394,182 @@ w `pyproject.toml` można zdefiniować konfigurację backendu.
 
 
 Na kolosie trzeba będzie użyć jeden z tych menedzerów pakietów i zbudować taki projekt i nim zarządzać.
+
+
+### Rye cheatsheet
+* `rye init` - creates project
+* `rye add` - dodanie dependency
+* `rye sync` - sync (żeby pobrać dependencies)
+* `rye fmt` - formatuje pliki
+* `rye run` - odpala projekt, np. `rye run uvicorn rye_test:app --reload` - można umieścić jako skrypt w pyproject.toml
+* `rye lint` - lintuje, z flagą `--fix` naprawia
+* w pliku `.python-version` - wersja pythona można wpisać jaką chcemy
+
+
+## Wykład 9
+Numpy ...
+
+```python
+import numpy as np
+
+np.dot(v1, v2) # iloczyn skalarny
+```
+
+Konwolucja - wiadomo co to jest
+
+```python
+for i in range(output_size): # w jakiś obliczeniach matematycznych można
+    ...
+```
+
+```python
+np.convolve(np.array([1, 2, 3]), np.array([4, 5, 6])) # Konwolucja
+```
+
+Fancy indexing - wyrażenia warunkowe można wsadzać do indexów - i jest fajnie
+np. A[A > 0] da wszystkie elementy w arrayu większe od 0.
+
+Indeksowanie w numpy:
+```python
+>>> Y
+array([[ 0,  0,  7, 17, 13],
+       [ 2, 12, 11, 18, 18],
+       [15,  4,  6,  4,  9],
+       [ 5, 11,  4,  1,  7],
+       [ 5, 19, 14, 10, 16]])
+>>> Y[2, :]
+array([15,  4,  6,  4,  9])
+>>> Y[:, 2]
+array([ 7, 11,  6,  4, 14])
+```
+
+Można dodawać nowe wymiary:
+
+```python
+>>> Y[None, None, :, 2:3].shape
+(1, 1, 5, 1)
+>>> Y[np.newaxis, np.newaxis, :, 2:3].shape
+(1, 1, 5, 1)
+```
+W torchu też to jest
+
+Generalnie używa się tego żeby dopasować dane do odpowiednich kształtów.
+
+Można zmieniać kształty wektorów, macierzy:
+
+```python
+>>> np.arange(8)
+array([0, 1, 2, 3, 4, 5, 6, 7])
+>>> B = np.arange(8)
+>>> B.reshape((2, 4))
+array([[0, 1, 2, 3],
+       [4, 5, 6, 7]])
+```
+
+reshape domyślnie zwraca view - widok danych
+
+### Array broadcasting
+Wykonywanie operacji per-element na arrayach o różnych ale kompatybilnych kształtach.
+* [Array broadcasting](https://numpy.org/doc/stable/user/basics.broadcasting.html)
+* [Torch](https://pytorch.org/docs/stable/notes/broadcasting.html#general-semantics)
+
+PyTorch - numpy z autogradem, reszta to dodatki
+* Gilbert Strang - materiały z algebry liniowej od ziomeczka z MIT, warto obejrzeć dla powtórki
+
+SVD - Singular Value Decomposition
+każdą macierz można rozbić na 2 macierze obrotu i 1 skalowania (każda macierz wyraża operację: obrót -> skalowanie -> obrót). Mnożenie macierzy - ta operacja
+
+PCA - też ważny algorytm, warto kojarzyć
+
+### Tiny NN
+Mała sieć neuronowa w numpy
+
+neuron is activation(X*W + bias) \
+zakładamy że bez biasa \
+sigmoid(x) = 1 / (1 + np.exp(-x)) \
+* @ - mnożenie macierzy, można wykorzystać np.dot()
+
+sigmoid(x) = 1 / (1 + np.exp(-x)) \
+dsigmoid(x)/dx = sigmoid(x) * (1 - sigmoid(x))
+
+### Szybkie zgrabne interfejsy tesktowe (terminalowe) w Pythonie
+* tqdm - progress bar w terminalu
+* rich - bajery, kolorki
+
+Można łączyć, mało kodu i ładny interfejs terminalowy. \
+Rich obsługuje tabelki, markdowna, dodaje spinnery, można cały interfejs terminalowy stworzyć
+
+Argpase - w bibliotece standardowej
+można stworzyć subparser do parsowania podkomend (np. dla gita są inne flagi dla git commit, git init, git add, itp.)
+
+
+## Wykład 10
+### Interfejsy konsolowe - kontynuacja
+
+Ostatnio skończyliśmy na budowaniu interfejsów konsolowych
+argparse - w bibliotece standardowej pythona
+
+Inny przykład interfejsów konsolowych - biblioteka click (Flask korzysta z clicka, ten sam team to zrobił)
+
+Komendy - tworzy się za pomocą dekoratorów. Istnieje kontekts - dekorator `@pass_context` - pozwala dodawać komendy do słownika.
+Wiadomości o pomocy - help message - czytany bezpośrednio z docstringa.
+
+Biblioteka typer - zbudowana na clicku przez team od FastAPI itp. Czyta dużo z samych argumentów funkcji - typehinty.
+
+w typerze operator ellipsis - `...` - podobnie jak w FastAPI oznacza, że argument jest wymagany. Typer zbudowany też na richu - więc ładny output na wyjściu.
+
+Biblioteka python-fire - tworzy automatycznie interfejs konsolowy - wystawia logikę programu, łyka dużo rzeczy - klasę, funkcję, moduł, słownik itp... Podanie klasy - wtedy wystawia metody klasy. Posiada tutorial na githubie. Automatyczne przetwarzanie wyjątków.
+
+
+### Torch
+
+Najważniejszy element torcha - autograd (silnik do automatycznego różniczkowania). Torch:
+* autograd
+* numpy na tensorach (operacje na tensorach)
+* obiektowe komponenty do budowy sieci neuronowych
+
+Biblioteka micrograd - biblioteka od Karpathy'ego. Na potrzebny edukacyjne, służy do tego, by pokazać jak działa silnik do obliczeń różniczkowych.
+
+Automatyczne różniczkowanie.
+
+Tensor - liść - stworzony przez użytkownika. Gradienty będą przechowywane. Dla tensorów nie liści, gradienty są obliczane, ale nie przechowywane. Przy tworzeniu tensoru, funckja pochodnej jest ustawiana na odpowiednią.
+
+### Tensorboard
+* Istnieje też weights and biases
+Do śledzenia eksperymentów, metryk. Wbudowane w torcha. Ma też wady (trudniej dobrać się do logów).
+Fajny jak używamy wbudowanych funkcji, trochę trudniej dostać się do surowych logów.
+
+### Powrót do torcha:
+* torch.cat
+
+```python
+import torch
+x = torch.tensor([0, 1, 2])
+torch.cat([x ** 10, torch.zeros_like(x)])
+>>> tensor([   0,    1, 1024,    0,    0,    0])
+```
+* torch.stack
+```python
+torch.stack([x ** 10, torch.zeros_like(x)])
+>>> tensor([[   0,    1, 1024],
+        [   0,    0,    0]])
+torch.stack([x ** 10, torch.zeros_like(x)], dim=1)
+>>> tensor([[   0,    0],
+        [   1,    0],
+        [1024,    0]])
+
+```
+
+Pro tip - można nadawać nazwy wymiarom:
+```python
+z = torch.tensor([1, 2], [3, 4], [5, 6])
+B, H, W = z.shape
+```
+
+Worth - [torch cheatsheet](https://pytorch.org/tutorials/beginner/ptcheat.html)
+
+### Powrót do Pythona - logging, requests, BeautifulSoup
+* BeautifulSoup - biblioteka do scrapowania, parser html
+* requests - no requesty można robić fajna sprawa
+* moduł logging - z biblioteki standardowej Pythona, do tworzenia logów.
+* nowsza biblioteka do logowania - zewnętrzna, obecnie najpopularniejsza - loguru. Nie trzeba ręcznie podawać formatu, daje to z automatu.
